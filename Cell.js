@@ -11,7 +11,10 @@ class Cell {
   }
 
   render() {
-    if (this.active)
+    if (this.active) {
+      noStroke()
+      noSmooth()
       rect(this.x, this.y, this.w, this.h)
+    }
   }
 }

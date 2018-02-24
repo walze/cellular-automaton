@@ -19,11 +19,11 @@ function setup() {
   createCanvas(1700, 950)
   cols = width / RESO
   rows = height / RESO
-  frameRate(10)
+  frameRate(29)
   grid = make2DArray(cols, rows)
 
   canvas.getContext('2d', { alpha: false })
-  let ctx = canvas.getContext('2d')  
+  let ctx = canvas.getContext('2d')
   ctx.imageSmoothingEnabled = false
   ctx.webkitImageSmoothingEnabled = false
   ctx.mozImageSmoothingEnabled = false
@@ -50,19 +50,16 @@ function setup() {
 }
 
 var grow = true
-var totalActive = () => {
-  let actives = []
-  for (row of grid) for (e of row) actives.push(e.active)
-  return actives
-}
+
 
 function draw() {
-  background('#111')
+  clear()
 
-  grid.map(rows => {
-    rows.map(cell => {
+  // faster than .map()
+  for (let i = 0; i < cols; i++)
+    for (let j = 0; j < rows; j++) {
 
-      cell.render()
+      let cell = grid[i][j]
 
       let state = cell.active
 
@@ -77,31 +74,31 @@ function draw() {
       //   grow = true
       // }
 
-      if(grow) {
-      if (!state && numNeightbours == 3) {
-        cell.active = true
-      }
-      else if (state && (numNeightbours == 0)) {
-        neightbours(grid, cell.col, cell.row, (neiX, neiY) => grid[neiX][neiY].active = true)
-        state = false
-      }
-      else if (state && (numNeightbours < 4 || numNeightbours > 7))
-        cell.active = false
-      else
-        cell.active = state
+      if (grow) {
+        if (!state && numNeightbours == 3) {
+          cell.active = true
+        }
+        else if (state && (numNeightbours == 0)) {
+          neightbours(grid, cell.col, cell.row, (neiX, neiY) => grid[neiX][neiY].active = true)
+          state = false
+        }
+        else if (state && (numNeightbours < 4 || numNeightbours > 7))
+          cell.active = false
+        else
+          cell.active = state
 
       } else {
         if (!state && numNeightbours == 3) {
           cell.active = true
         }
-        else if (state && numNeightbours > 6)           cell.active = false
-        else if (state && (numNeightbours < 4 || numNeightbours > 7))          cell.active = false
+        else if (state && numNeightbours > 6) cell.active = false
+        else if (state && (numNeightbours < 4 || numNeightbours > 7)) cell.active = false
         else cell.active = state
       }
 
-    })
+      cell.render()
+    }
 
-  })
 }
 
 function mousePressed(e) {
