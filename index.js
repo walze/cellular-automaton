@@ -1,3 +1,5 @@
+document.addEventListener('contextmenu', event => event.preventDefault())
+
 function make2DArray(cols, rows) {
   let arr = new Array(cols)
 
@@ -59,6 +61,13 @@ function draw() {
   for (let i = 0; i < cols; i++)
     for (let j = 0; j < rows; j++) {
 
+      if (mouseIsPressed) {
+        if (mouseButton === LEFT)
+          grow = true
+        if (mouseButton === RIGHT)
+          grow = false
+      }
+
       let cell = grid[i][j]
 
       let state = cell.active
@@ -66,13 +75,6 @@ function draw() {
       // count live neightbours
       let numNeightbours = countNeightbours(grid, cell.col, cell.row)
 
-      // if (totalActive > 313150) {
-      //   console.warn('not growing')        
-      //   grow = false
-      // }  else if (totalActive < 500) {
-      //   console.warn('growing')
-      //   grow = true
-      // }
 
       if (grow) {
         if (!state && numNeightbours == 3) {
