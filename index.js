@@ -76,31 +76,39 @@ function draw() {
       let numNeightbours = countNeightbours(grid, cell.col, cell.row)
 
 
-      if (grow) {
-        if (!state && numNeightbours == 3) {
-          cell.active = true
-        }
-        else if (state && (numNeightbours == 0)) {
-          neightbours(grid, cell.col, cell.row, (neiX, neiY) => grid[neiX][neiY].active = true)
-          state = false
-        }
-        else if (state && (numNeightbours < 4 || numNeightbours > 7))
-          cell.active = false
-        else
-          cell.active = state
+      if (grow)
+        growConditions(state, numNeightbours, cell);
+      else
+        notGrowConditions(state, numNeightbours, cell);
 
-      } else {
-        if (!state && numNeightbours == 3) {
-          cell.active = true
-        }
-        else if (state && numNeightbours > 6) cell.active = false
-        else if (state && (numNeightbours < 4 || numNeightbours > 7)) cell.active = false
-        else cell.active = state
-      }
 
       cell.render()
     }
 
+}
+
+function notGrowConditions(state, numNeightbours, cell) {
+  if (!state && numNeightbours == 4) {
+    cell.active = true;
+  }
+  else if (state && (numNeightbours < 4 || numNeightbours > 6))
+    cell.active = false;
+  else
+    cell.active = state;
+}
+
+function growConditions(state, numNeightbours, cell) {
+  if (!state && numNeightbours == 3) {
+    cell.active = true;
+  }
+  else if (state && (numNeightbours == 0)) {
+    neightbours(grid, cell.col, cell.row, (neiX, neiY) => grid[neiX][neiY].active = true);
+    state = false;
+  }
+  else if (state && (numNeightbours < 4 || numNeightbours > 7))
+    cell.active = false;
+  else
+    cell.active = state;
 }
 
 function mousePressed(e) {
