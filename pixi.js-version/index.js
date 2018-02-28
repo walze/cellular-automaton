@@ -13,7 +13,7 @@ function make2DArray(cols, rows) {
 }
 
 
-const RESO = 40
+const RESO = 4
 let cols = APP.view.width / RESO
 let rows = APP.view.height / RESO
 let grid = make2DArray(cols, rows)
@@ -32,6 +32,10 @@ for (let i = 0; i < cols; i++)
       col: i,
       row: j
     })
+
+    grid[i][j].visible = false
+
+    grid[i][j].on('click', e => alert())
 
     APP.stage.addChild(grid[i][j])
 
@@ -72,9 +76,7 @@ APP.ticker.add(function (delta) {
 
 
 
-
-
-
+APP.view.addEventListener('click', e => mousePressed(e))
 
 function notGrowConditions(state, numNeightbours, cell) {
   if (!state && numNeightbours == 4) {
@@ -90,11 +92,11 @@ function growConditions(state, numNeightbours, cell) {
   if (!state && numNeightbours == 3) {
     cell.visible = true;
   }
-  // else if (state && (numNeightbours == 0)) {
-  //   neightbours(grid, cell.col, cell.row, (neiX, neiY) => grid[neiX][neiY].visible = true);
-  //   state = false;
-  // }
-  else if (state && (numNeightbours < 2 || numNeightbours > 3))
+  else if (state && (numNeightbours == 0)) {
+    neightbours(grid, cell.col, cell.row, (neiX, neiY) => grid[neiX][neiY].visible = true);
+    state = false;
+  }
+  else if (state && (numNeightbours < 4 || numNeightbours > 7))
     cell.visible = false;
   else
     cell.visible = state;
@@ -103,9 +105,9 @@ function growConditions(state, numNeightbours, cell) {
 function mousePressed(e) {
   const Target = e.target
 
-  if (Target == canvas) {
-    const Col = floor(e.pageX / RESO)
-    const Row = floor(e.pageY / RESO)
+  if (Target == APP.view) {
+    const Col = Math.floor(e.pageX / RESO)
+    const Row = Math.floor(e.pageY / RESO)
 
     const Cell = grid[Col][Row]
     console.log(Cell)
