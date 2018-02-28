@@ -1,4 +1,10 @@
-const APP = new PIXI.Application(800, 600);
+const APP = new PIXI.Application({
+  width: 900,
+  height: 600,
+  legacy: true,
+  powerPreference: "high-performance"
+});
+
 document.body.appendChild(APP.view);
 
 document.addEventListener('contextmenu', event => event.preventDefault())
@@ -13,7 +19,7 @@ function make2DArray(cols, rows) {
 }
 
 
-const RESO = 4
+const RESO = 5
 let cols = APP.view.width / RESO
 let rows = APP.view.height / RESO
 let grid = make2DArray(cols, rows)
@@ -35,15 +41,12 @@ for (let i = 0; i < cols; i++)
 
     grid[i][j].visible = false
 
-    grid[i][j].on('click', e => alert())
-
     APP.stage.addChild(grid[i][j])
 
     counter++
   }
 
-
-APP.ticker.add(function (delta) {
+APP.ticker.add((delta) => {
 
   // faster than .map()
   for (let i = 0; i < cols; i++)
@@ -90,14 +93,14 @@ function notGrowConditions(state, numNeightbours, cell) {
 
 function growConditions(state, numNeightbours, cell) {
   if (!state && numNeightbours == 3) {
-    cell.visible = true;
+    cell.visible = !cell.visible;
   }
   else if (state && (numNeightbours == 0)) {
-    neightbours(grid, cell.col, cell.row, (neiX, neiY) => grid[neiX][neiY].visible = true);
-    state = false;
+    neightbours(grid, cell.col, cell.row, (neiX, neiY) => grid[neiX][neiY].visible = !grid[neiX][neiY].visible);
+    //state = false;
   }
   else if (state && (numNeightbours < 4 || numNeightbours > 7))
-    cell.visible = false;
+    cell.visible = !cell.visible;
   else
     cell.visible = state;
 }
