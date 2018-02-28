@@ -1,20 +1,12 @@
-class Cell {
+class Cell extends PIXI.Graphics {
   constructor(obj) {
-    this.id = obj.id
-    this.x = obj.x
-    this.y = obj.y
-    this.w = obj.w
-    this.h = obj.h
+    super()
+
     this.col = obj.col
     this.row = obj.row
-    this.active = obj.active
-  }
 
-  render() {
-    if (this.active) {
-      noStroke()
-      noSmooth()
-      rect(this.x, this.y, this.w, this.h)
-    }
+    this.beginFill(`0x${obj.color || 'FFFFFF'}`);
+    this.drawRect(obj.x, obj.y, obj.w, obj.h);
+    this.endFill();
   }
 }

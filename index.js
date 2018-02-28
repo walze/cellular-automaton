@@ -62,10 +62,8 @@ function draw() {
     for (let j = 0; j < rows; j++) {
 
       if (mouseIsPressed) {
-        if (mouseButton === LEFT)
-          grow = true
-        if (mouseButton === RIGHT)
-          grow = false
+        if (mouseButton === LEFT) grow = true
+        if (mouseButton === RIGHT) grow = false
       }
 
       let cell = grid[i][j]
@@ -150,7 +148,3 @@ function neightbours(grid, x, y, cb) {
     }
   }
 }
-
-// neightbours(grid, 24, 40, (neiX, neiY) => {
-//   console.log(neiX, neiY)
-// })
