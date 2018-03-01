@@ -1,3 +1,12 @@
+const APP = new PIXI.Application({
+  width: 900,
+  height: 600,
+  legacy: true,
+  powerPreference: "high-performance"
+});
+
+document.body.appendChild(APP.view);
+
 document.addEventListener('contextmenu', event => event.preventDefault())
 
 function make2DArray(cols, rows) {
@@ -9,116 +18,103 @@ function make2DArray(cols, rows) {
   return arr
 }
 
-let grid
-let cols
-let rows
-const RESO = 10
+
+const RESO = 5
+let cols = APP.view.width / RESO
+let rows = APP.view.height / RESO
+let grid = make2DArray(cols, rows)
 let counter = 0
 
-p5.disableFriendlyErrors = true
+for (let i = 0; i < cols; i++)
+  for (let j = 0; j < rows; j++) {
+    let x = i * RESO
+    let y = j * RESO
 
-function setup() {
-  createCanvas(1700, 950)
-  cols = width / RESO
-  rows = height / RESO
-  frameRate(29)
-  grid = make2DArray(cols, rows)
+    grid[i][j] = new Cell({
+      x,
+      y,
+      w: RESO - 1,
+      h: RESO - 1,
+      col: i,
+      row: j
+    })
 
-  canvas.getContext('2d', { alpha: false })
-  let ctx = canvas.getContext('2d')
-  ctx.imageSmoothingEnabled = false
-  ctx.webkitImageSmoothingEnabled = false
-  ctx.mozImageSmoothingEnabled = false
+    grid[i][j].visible = false
 
-  for (let i = 0; i < cols; i++)
-    for (let j = 0; j < rows; j++) {
-      let x = i * RESO
-      let y = j * RESO
+    APP.stage.addChild(grid[i][j])
 
-      grid[i][j] = new Cell({
-        id: counter,
-        x,
-        y,
-        w: RESO - 1,
-        h: RESO - 1,
-        col: i,
-        row: j,
-        active: false
-      })
+    counter++
+  }
 
-      counter++
-    }
-
-}
-
-var grow = true
-
-
-function draw() {
-  clear()
+APP.ticker.add((delta) => {
 
   // faster than .map()
   for (let i = 0; i < cols; i++)
     for (let j = 0; j < rows; j++) {
 
-      if (mouseIsPressed) {
-        if (mouseButton === LEFT) grow = true
-        if (mouseButton === RIGHT) grow = false
-      }
-
       let cell = grid[i][j]
 
-      let state = cell.active
+      let state = cell.visible
 
       // count live neightbours
       let numNeightbours = countNeightbours(grid, cell.col, cell.row)
 
 
-      if (grow)
+      if (true)
         growConditions(state, numNeightbours, cell);
       else
         notGrowConditions(state, numNeightbours, cell);
-
-
-      cell.render()
     }
 
-}
+
+});
+
+
+
+
+
+
+
+
+
+
+
+APP.view.addEventListener('click', e => mousePressed(e))
 
 function notGrowConditions(state, numNeightbours, cell) {
   if (!state && numNeightbours == 4) {
-    cell.active = true;
+    cell.visible = true;
   }
   else if (state && (numNeightbours < 4 || numNeightbours > 6))
-    cell.active = false;
+    cell.visible = false;
   else
-    cell.active = state;
+    cell.visible = state;
 }
 
 function growConditions(state, numNeightbours, cell) {
   if (!state && numNeightbours == 3) {
-    cell.active = true;
+    cell.visible = !cell.visible;
   }
   else if (state && (numNeightbours == 0)) {
-    neightbours(grid, cell.col, cell.row, (neiX, neiY) => grid[neiX][neiY].active = true);
-    state = false;
+    neightbours(grid, cell.col, cell.row, (neiX, neiY) => grid[neiX][neiY].visible = !grid[neiX][neiY].visible);
+    //state = false;
   }
   else if (state && (numNeightbours < 4 || numNeightbours > 7))
-    cell.active = false;
+    cell.visible = !cell.visible;
   else
-    cell.active = state;
+    cell.visible = state;
 }
 
 function mousePressed(e) {
   const Target = e.target
 
-  if (Target == canvas) {
-    const Col = floor(e.pageX / RESO)
-    const Row = floor(e.pageY / RESO)
+  if (Target == APP.view) {
+    const Col = Math.floor(e.pageX / RESO)
+    const Row = Math.floor(e.pageY / RESO)
 
     const Cell = grid[Col][Row]
     console.log(Cell)
-    Cell.active = !Cell.active
+    Cell.visible = !Cell.visible
   }
 }
 
@@ -130,11 +126,11 @@ function countNeightbours(grid, x, y) {
       let col = (x + i + cols) % cols
       let row = (y + j + rows) % rows
 
-      sum += grid[col][row].active
+      sum += grid[col][row].visible
     }
   }
 
-  sum -= grid[x][y].active
+  sum -= grid[x][y].visible
   return sum
 }
 
