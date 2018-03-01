@@ -1,7 +1,6 @@
 const APP = new PIXI.Application({
   width: 900,
   height: 600,
-  legacy: true,
   powerPreference: "high-performance"
 });
 
