@@ -1,5 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
 	entry: './src/index.ts',
@@ -22,6 +23,13 @@ module.exports = {
 		path: path.resolve(__dirname, 'dist')
 	},
 	plugins: [
+		new UglifyJsPlugin({
+			sourceMap: true,
+			extractComments: true,
+			uglifyOptions: {
+				compress: true,
+			}
+		}),
 		new HtmlWebpackPlugin({ template: './src/index.html' })
 	]
 };
