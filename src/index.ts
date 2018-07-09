@@ -4,6 +4,7 @@ import { Cell, ICellContructor } from './Cell';
 const APP = new Application({
   width: 1000,
   height: 700,
+  forceFXAA: true,
   powerPreference: "high-performance",
 })
 
@@ -19,7 +20,7 @@ function make2DArray(colsN: number, rowsN: number): any[][] {
   return arr
 }
 
-const RESO = 4
+const RESO = 2
 const cols = APP.view.width / RESO
 const rows = APP.view.height / RESO
 const grid: Cell[][] = make2DArray(cols, rows)
@@ -46,7 +47,8 @@ for (let i = 0; i < cols; i++)
 
   }
 
-APP.ticker.add((delta) => {
+const ticker = APP.ticker.add((delta) => {
+  // console.log(Math.round(ticker.FPS))
 
   // faster than .map()
   for (let i = 0; i < cols; i++)
@@ -66,6 +68,8 @@ APP.ticker.add((delta) => {
     }
 
 });
+
+ticker.minFPS = 30
 
 APP.view.addEventListener('click', e => mousePressed(e))
 
@@ -98,7 +102,7 @@ function mousePressed(e: MouseEvent) {
     const Row = Math.floor(e.pageY / RESO)
 
     const cell = grid[Col][Row]
-    console.log(cell)
+
     cell.visible = !cell.visible
   }
 }
