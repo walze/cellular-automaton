@@ -74,7 +74,7 @@ function growConditions(cell: Cell) {
   if (!state && numNeightbours === 3)
     cell.visible = !cell.visible
   else if (state && (numNeightbours === 0))
-    cell.neighborhood().all.map(cell => cell.visible = !cell.visible)
+    cell.neighborhood().all.map(neighbor => neighbor.visible = !neighbor.visible)
   else if (state && (numNeightbours < 4 || numNeightbours > 7))
     cell.visible = !cell.visible
   else
