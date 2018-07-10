@@ -1,6 +1,7 @@
 import { Graphics } from 'pixi.js'
 
 export interface ICellContructor {
+  grid: Cell[][]
   col: number
   row: number
   color?: string
@@ -10,21 +11,93 @@ export interface ICellContructor {
   h: number
 }
 
+export interface INeighbors {
+  all: Cell[]
+  top: {
+    left: Cell
+    center: Cell
+    right: Cell
+  }
+  center: {
+    left: Cell
+    self: Cell
+    right: Cell
+  }
+  bottom: {
+    left: Cell
+    center: Cell
+    right: Cell
+  }
+}
+
 export class Cell extends Graphics {
 
+  public readonly grid: Cell[][]
   public col: number
   public row: number
+  private _neighborhood: INeighbors | null = null
 
   constructor(obj: ICellContructor) {
     super()
 
     this.col = obj.col
     this.row = obj.row
+    this.grid = obj.grid
 
     const color = Number(`0x${obj.color || 'FFFFFF'}`)
 
     this.beginFill(color);
     this.drawRect(obj.x, obj.y, obj.w, obj.h);
     this.endFill();
+  }
+
+  public countActiveNeighbors() {
+    let sum = 0
+
+    this.neighborhood().all.map(neighbor => {
+      if (neighbor.visible) sum++
+    })
+
+    return sum
+  }
+
+  public neighborhood(): INeighbors {
+    if (this._neighborhood) return this._neighborhood
+
+    const cols = this.grid.length
+    const rows = this.grid[0].length
+
+    const neighbors = {
+      all: [] as Cell[],
+      top: {
+        left: this.grid[(this.col - 1 + cols) % cols][(this.row - 1 + rows) % rows],
+        center: this.grid[(this.col - 1 + cols) % cols][(this.row + rows) % rows],
+        right: this.grid[(this.col - 1 + cols) % cols][(this.row + 1 + rows) % rows]
+      },
+      center: {
+        left: this.grid[(this.col + cols) % cols][(this.row - 1 + rows) % rows],
+        self: this,
+        right: this.grid[(this.col + cols) % cols][(this.row + 1 + rows) % rows]
+      },
+      bottom: {
+        left: this.grid[(this.col + 1 + cols) % cols][(this.row - 1 + rows) % rows],
+        center: this.grid[(this.col + 1 + cols) % cols][(this.row + rows) % rows],
+        right: this.grid[(this.col + 1 + cols) % cols][(this.row + 1 + rows) % rows]
+      }
+    }
+
+    neighbors.all = [
+      neighbors.top.left,
+      neighbors.top.center,
+      neighbors.top.right,
+      neighbors.center.left,
+      neighbors.center.right,
+      neighbors.bottom.left,
+      neighbors.bottom.center,
+      neighbors.bottom.right,
+    ]
+
+    this._neighborhood = neighbors
+    return neighbors
   }
 }

@@ -1,5 +1,6 @@
 import { Application } from 'pixi.js'
 import { Cell, ICellContructor } from './Cell';
+import { make2DArray, map2d } from './helpers';
 
 const APP = new Application({
   width: 1000,
@@ -11,124 +12,75 @@ const APP = new Application({
 document.body.appendChild(APP.view)
 document.addEventListener('contextmenu', e => e.preventDefault())
 
-function make2DArray(colsN: number, rowsN: number): any[][] {
-  const arr = new Array(colsN)
-
-  for (let i = 0; i < arr.length; i++)
-    arr[i] = new Array(rowsN)
-
-  return arr
-}
-
-const RESO = 2
+const RESO = 5
 const cols = APP.view.width / RESO
 const rows = APP.view.height / RESO
+
 const grid: Cell[][] = make2DArray(cols, rows)
 
-for (let i = 0; i < cols; i++)
-  for (let j = 0; j < rows; j++) {
-    const x = i * RESO
-    const y = j * RESO
+console.log({ grid })
+console.log(`Rendered ${cols} Columns and ${rows} Rows`)
 
-    const cellOptions: ICellContructor = {
-      x,
-      y,
-      w: RESO - 1,
-      h: RESO - 1,
-      col: i,
-      row: j,
-    }
+map2d(grid, (col, row) => {
+  const x = col * RESO
+  const y = row * RESO
 
-    grid[i][j] = new Cell(cellOptions)
-
-    grid[i][j].visible = false
-
-    APP.stage.addChild(grid[i][j])
-
+  const cellOptions: ICellContructor = {
+    grid,
+    x,
+    y,
+    w: RESO - 1,
+    h: RESO - 1,
+    col,
+    row,
   }
+
+  grid[col][row] = new Cell(cellOptions)
+
+  grid[col][row].visible = false
+
+  APP.stage.addChild(grid[col][row])
+
+})
 
 const ticker = APP.ticker.add((delta) => {
   // console.log(Math.round(ticker.FPS))
 
-  // faster than .map()
-  for (let i = 0; i < cols; i++)
-    for (let j = 0; j < rows; j++) {
+  map2d(grid, (col, row) => {
 
-      const cell = grid[i][j]
+    const cell = grid[col][row]
 
-      const state = cell.visible
-
-      // count live neightbours
-      const numNeightbours = countNeightbours(grid, cell.col, cell.row)
-
-      if (true)
-        growConditions(state, numNeightbours, cell);
-      else
-        notGrowConditions(state, numNeightbours, cell);
-    }
-
-});
+    if (true) growConditions(cell);
+    // else notGrowConditions(cell);
+  })
+})
 
 ticker.minFPS = 30
 
-APP.view.addEventListener('click', e => mousePressed(e))
+APP.view.addEventListener('mousedown', (e) => {
+  const cell = click(e)
+  cell!.visible = !cell!.visible
 
-function notGrowConditions(state: boolean, numNeightbours: number, cell: Cell) {
-  if (!state && numNeightbours === 4) {
-    cell.visible = true;
-  } else if (state && (numNeightbours < 4 || numNeightbours > 6))
-    cell.visible = false;
-  else
-    cell.visible = state;
+  // APP.view.addEventListener('mousemove', event => {})
+})
+
+function growConditions(cell: Cell) {
+  const numNeightbours = cell.countActiveNeighbors()
+  const active = cell.visible
+
+  if (active && numNeightbours === 0)
+    cell.neighborhood().all.map(cell => cell.visible = true)
+  else if (active && numNeightbours < 2 && numNeightbours > 3)
+    cell.visible = false
+  else if (!active && numNeightbours == 3)
+    cell.visible = true
 }
 
-function growConditions(state: boolean, numNeightbours: number, cell: Cell) {
-  if (!state && numNeightbours === 3) {
-    cell.visible = !cell.visible;
-  } else if (state && (numNeightbours === 0)) {
-    neightbours(cell.col, cell.row, (neiX: number, neiY: number) => grid[neiX][neiY].visible = !grid[neiX][neiY].visible);
-    // state = false;
-  } else if (state && (numNeightbours < 4 || numNeightbours > 7))
-    cell.visible = !cell.visible;
-  else
-    cell.visible = state;
-}
+function click(e: MouseEvent) {
+  if (e.target !== APP.view) return
 
-function mousePressed(e: MouseEvent) {
-  const Target = e.target
+  const Col = Math.floor(e.pageX / RESO)
+  const Row = Math.floor(e.pageY / RESO)
 
-  if (Target === APP.view) {
-    const Col = Math.floor(e.pageX / RESO)
-    const Row = Math.floor(e.pageY / RESO)
-
-    const cell = grid[Col][Row]
-
-    cell.visible = !cell.visible
-  }
-}
-
-function countNeightbours(gridRef: Cell[][], x: number, y: number) {
-  let sum = 0
-  for (let i = -1; i < 2; i++) {
-    for (let j = -1; j < 2; j++) {
-      const col = (x + i + cols) % cols
-      const row = (y + j + rows) % rows
-
-      sum += Number(gridRef[col][row].visible)
-    }
-  }
-
-  sum -= Number(gridRef[x][y].visible)
-  return sum
-}
-
-function neightbours(x: number, y: number, cb: (...args: any[]) => void) {
-  for (let i = -1; i < 2; i++) {
-    for (let j = -1; j < 2; j++) {
-      const col = (x + i + cols) % cols
-      const row = (y + j + rows) % rows
-
-      cb(col, row)
-    }
-  }
+  return grid[Col][Row]
 }

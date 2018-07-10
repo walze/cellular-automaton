@@ -2,10 +2,9 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
-module.exports = {
+const config = {
 	entry: './src/index.ts',
 	devtool: 'inline-source-map',
-	mode: 'development',
 	module: {
 		rules: [
 			{
@@ -23,13 +22,20 @@ module.exports = {
 		path: path.resolve(__dirname, 'docs')
 	},
 	plugins: [
+		new HtmlWebpackPlugin({ template: './src/index.html' })
+	]
+}
+
+process.env.NODE_ENV === 'production' ?
+	config.plugins.push(
 		new UglifyJsPlugin({
 			sourceMap: true,
 			extractComments: true,
 			uglifyOptions: {
 				compress: true,
 			}
-		}),
-		new HtmlWebpackPlugin({ template: './src/index.html' })
-	]
-};
+		})
+	)
+	: null
+
+module.exports = config
