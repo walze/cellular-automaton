@@ -2,9 +2,12 @@ import { Application } from 'pixi.js'
 import { Cell, ICellContructor } from './Cell';
 import { make2DArray, map2d } from './helpers';
 
+if (window.innerWidth < 800) alert('Mobile is not supported')
+
 const APP = new Application({
-  width: 1000,
-  height: 700,
+  view: document.querySelector('#canvas') as HTMLCanvasElement,
+  width: 800,
+  height: 600,
   forceFXAA: true,
   powerPreference: "high-performance",
 })
@@ -13,8 +16,8 @@ document.body.appendChild(APP.view)
 document.addEventListener('contextmenu', e => e.preventDefault())
 
 const RESO = 5
-const cols = APP.view.width / RESO
-const rows = APP.view.height / RESO
+const cols = Math.round(APP.view.width / RESO)
+const rows = Math.round(APP.view.height / RESO)
 
 const grid: Cell[][] = make2DArray(cols, rows)
 
@@ -66,14 +69,16 @@ APP.view.addEventListener('mousedown', (e) => {
 
 function growConditions(cell: Cell) {
   const numNeightbours = cell.countActiveNeighbors()
-  const active = cell.visible
+  const state = cell.visible
 
-  if (active && numNeightbours === 0)
-    cell.neighborhood().all.map(cell => cell.visible = true)
-  else if (active && numNeightbours < 2 && numNeightbours > 3)
-    cell.visible = false
-  else if (!active && numNeightbours == 3)
-    cell.visible = true
+  if (!state && numNeightbours === 3)
+    cell.visible = !cell.visible
+  else if (state && (numNeightbours === 0))
+    cell.neighborhood().all.map(cell => cell.visible = !cell.visible)
+  else if (state && (numNeightbours < 4 || numNeightbours > 7))
+    cell.visible = !cell.visible
+  else
+    cell.visible = state
 }
 
 function click(e: MouseEvent) {
