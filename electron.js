@@ -1,13 +1,18 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow,  } = require('electron')
 
 let mainWindow
 
 function createWindow() {
   
-  mainWindow = new BrowserWindow({ width: 900, height: 700 })
+  mainWindow = new BrowserWindow({ 
+    width: 800 + 6, 
+    height: 600 + 49,
+    center: true,
+    resizable: false
+  })
   mainWindow.loadURL('http://localhost:8080/')
 
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', function () { mainWindow = null })
 }

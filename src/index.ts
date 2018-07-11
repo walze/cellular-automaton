@@ -6,8 +6,8 @@ if (window.innerWidth < 800) alert('Mobile is not supported')
 
 const APP = new Application({
   view: document.querySelector('#canvas') as HTMLCanvasElement,
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height: window.innerHeight,
   forceFXAA: true,
   powerPreference: "high-performance",
 })
@@ -15,7 +15,7 @@ const APP = new Application({
 document.body.appendChild(APP.view)
 document.addEventListener('contextmenu', e => e.preventDefault())
 
-const RESO = 5
+const RESO = 2
 const cols = Math.round(APP.view.width / RESO)
 const rows = Math.round(APP.view.height / RESO)
 
@@ -23,6 +23,7 @@ const grid: Cell[][] = make2DArray(cols, rows)
 
 console.log({ grid })
 console.log(`Rendered ${cols} Columns and ${rows} Rows`)
+console.log(`Width: ${APP.view.width}, Height: ${APP.view.height}`)
 
 map2d(grid, (col, row) => {
   const x = col * RESO
