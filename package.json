@@ -5,7 +5,9 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --open --mode=development",
+    "start": "concurrently \"npm run dev\" \"npm run electron\"",
+    "dev": "webpack-dev-server --mode=development",
+    "electron": "nodemon --watch * --exec \"electron electron.js\"",
     "build": "webpack --mode=production"
   },
   "repository": {
@@ -20,6 +22,8 @@
   "homepage": "https://github.com/Walze/cellular-automaton#readme",
   "dependencies": {
     "@types/pixi.js": "^4.8.0",
+    "concurrently": "^3.6.0",
+    "electron": "^2.0.4",
     "html-webpack-plugin": "^3.2.0",
     "pixi.js": "^4.8.1",
     "ts-loader": "^4.4.2",
