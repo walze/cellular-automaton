@@ -10,7 +10,7 @@
     "electron": "nodemon --watch * --exec \"electron docs/electron.js\"",
     "bundle": "webpack --mode=production",
     "build": "electron-packager ./docs/ cell --platform=win32 --arch=x64 --overwrite --out=build/",
-    "build:asar": "electron-packager ./docs/ cell --platform=win32 --arch=x64 --overwrite --out=build/ --asar=true"
+    "build:asar": "electron-packager ./docs/ cell --platform=win32 --arch=x64 --overwrite --out=build/ --asar"
   },
   "repository": {
     "type": "git",
@@ -22,12 +22,12 @@
     "url": "https://github.com/Walze/cellular-automaton/issues"
   },
   "homepage": "https://github.com/Walze/cellular-automaton#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "electron": "^2.0.4",
     "@types/pixi.js": "^4.8.0",
     "concurrently": "^3.6.0",
+    "electron": "^2.0.4",
+    "electron-packager": "^12.1.0",
     "html-webpack-plugin": "^3.2.0",
     "pixi.js": "^4.8.1",
     "ts-loader": "^4.4.2",
