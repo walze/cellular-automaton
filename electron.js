@@ -2,7 +2,8 @@ const { app, BrowserWindow, } = require('electron')
 
 let mainWindow
 
-function createWindow() {
+function createWindow(...args) {
+  console.log(args)
 
   mainWindow = new BrowserWindow({
     width: 800 + 6,
@@ -10,7 +11,13 @@ function createWindow() {
     center: true,
     resizable: false
   })
-  mainWindow.loadURL(`file:///${__dirname}/index.html`)
+
+  // prod
+  // mainWindow.loadURL(`file:///${__dirname}/index.html`)
+
+  // dev
+  mainWindow.loadURL(`http://localhost:1234/`)
+
 
   // mainWindow.webContents.openDevTools()
 
