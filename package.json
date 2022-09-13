@@ -4,13 +4,8 @@
   "description": "\"# cellular-automaton\"",
   "main": "docs/electron.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"npm run dev\" \"npm run electron\"",
-    "dev": "webpack-dev-server --mode=development",
-    "electron": "nodemon --watch * --exec \"electron docs/electron.js\"",
-    "bundle": "webpack --mode=production",
-    "build": "electron-packager ./docs/ cell --platform=win32 --arch=x64 --overwrite --out=build/",
-    "build:asar": "electron-packager ./docs/ cell --platform=win32 --arch=x64 --overwrite --out=build/ --asar"
+    "dev": "vite",
+    "build": "vite build --outDir docs"
   },
   "repository": {
     "type": "git",
@@ -22,19 +17,12 @@
     "url": "https://github.com/Walze/cellular-automaton/issues"
   },
   "homepage": "https://github.com/Walze/cellular-automaton#readme",
-  "dependencies": {},
   "devDependencies": {
-    "concurrently": "^3.6.0",
-    "electron": "^2.0.4",
-    "electron-packager": "^12.1.0",
-    "html-webpack-plugin": "^3.2.0",
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.3"
+  },
+  "dependencies": {
     "pixi.js": "^6.5.3",
-    "ts-loader": "^4.4.2",
-    "tslib": "^1.9.3",
-    "typescript": "^2.9.2",
-    "uglifyjs-webpack-plugin": "^1.2.7",
-    "webpack": "^4.15.1",
-    "webpack-cli": "^3.0.8",
-    "webpack-dev-server": "^3.1.4"
+    "vite": "^3.1.0"
   }
 }
