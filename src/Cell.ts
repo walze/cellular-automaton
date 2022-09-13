@@ -1,90 +1,104 @@
-import { Graphics } from 'pixi.js'
+import { Sprite, Texture } from "pixi.js";
 
 export interface ICellContructor {
-  grid: Cell[][]
-  col: number
-  row: number
-  color?: string
-  x: number
-  y: number
-  w: number
-  h: number
+  grid: Cell[][];
+  col: number;
+  row: number;
+  color?: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
 }
 
 export interface INeighbors {
-  all: Cell[]
+  all: Cell[];
   top: {
-    left: Cell
-    center: Cell
-    right: Cell
-  }
+    left: Cell;
+    center: Cell;
+    right: Cell;
+  };
   center: {
-    left: Cell
-    self: Cell
-    right: Cell
-  }
+    left: Cell;
+    self: Cell;
+    right: Cell;
+  };
   bottom: {
-    left: Cell
-    center: Cell
-    right: Cell
-  }
+    left: Cell;
+    center: Cell;
+    right: Cell;
+  };
 }
 
-export class Cell extends Graphics {
+const c = new OffscreenCanvas(1, 1) as any as HTMLCanvasElement;
+const ctx = c.getContext("2d") as any as CanvasRenderingContext2D;
+ctx.fillStyle = "white";
+ctx.fillRect(0, 0, 1, 1);
+const texture = Texture.from(c);
 
-  public readonly grid: Cell[][]
-  public col: number
-  public row: number
-  private _neighborhood: INeighbors | null = null
+export class Cell extends Sprite {
+  public readonly grid: Cell[][];
+  public col: number;
+  public row: number;
+  private _neighborhood: INeighbors | null = null;
+  visible = false;
 
   constructor(obj: ICellContructor) {
-    super()
+    super(texture);
 
-    this.col = obj.col
-    this.row = obj.row
-    this.grid = obj.grid
+    this.col = obj.col;
+    this.row = obj.row;
+    this.grid = obj.grid;
 
-    const color = Number(`0x${obj.color || 'FFFFFF'}`)
-
-    this.beginFill(color);
-    this.drawRect(obj.x, obj.y, obj.w, obj.h);
-    this.endFill();
+    this.x = obj.x;
+    this.y = obj.y;
+    this.width = obj.w;
+    this.height = obj.h;
   }
 
   public countActiveNeighbors() {
-    let sum = 0
+    let sum = 0;
 
-    this.neighborhood().all.map(neighbor => {
-      if (neighbor.visible) sum++
-    })
+    this.neighborhood().all.map((neighbor) => {
+      if (neighbor.visible) sum++;
+    });
 
-    return sum
+    return sum;
   }
 
   public neighborhood(): INeighbors {
-    if (this._neighborhood) return this._neighborhood
+    if (this._neighborhood) return this._neighborhood;
 
-    const cols = this.grid.length
-    const rows = this.grid[0].length
+    const cols = this.grid.length;
+    const rows = this.grid[0].length;
 
     const neighbors = {
       all: [] as Cell[],
       top: {
-        left: this.grid[(this.col - 1 + cols) % cols][(this.row - 1 + rows) % rows],
-        center: this.grid[(this.col - 1 + cols) % cols][(this.row + rows) % rows],
-        right: this.grid[(this.col - 1 + cols) % cols][(this.row + 1 + rows) % rows]
+        left: this.grid[(this.col - 1 + cols) % cols][
+          (this.row - 1 + rows) % rows
+        ],
+        center:
+          this.grid[(this.col - 1 + cols) % cols][(this.row + rows) % rows],
+        right:
+          this.grid[(this.col - 1 + cols) % cols][(this.row + 1 + rows) % rows],
       },
       center: {
         left: this.grid[(this.col + cols) % cols][(this.row - 1 + rows) % rows],
         self: this,
-        right: this.grid[(this.col + cols) % cols][(this.row + 1 + rows) % rows]
+        right:
+          this.grid[(this.col + cols) % cols][(this.row + 1 + rows) % rows],
       },
       bottom: {
-        left: this.grid[(this.col + 1 + cols) % cols][(this.row - 1 + rows) % rows],
-        center: this.grid[(this.col + 1 + cols) % cols][(this.row + rows) % rows],
-        right: this.grid[(this.col + 1 + cols) % cols][(this.row + 1 + rows) % rows]
-      }
-    }
+        left: this.grid[(this.col + 1 + cols) % cols][
+          (this.row - 1 + rows) % rows
+        ],
+        center:
+          this.grid[(this.col + 1 + cols) % cols][(this.row + rows) % rows],
+        right:
+          this.grid[(this.col + 1 + cols) % cols][(this.row + 1 + rows) % rows],
+      },
+    };
 
     neighbors.all = [
       neighbors.top.left,
@@ -95,9 +109,9 @@ export class Cell extends Graphics {
       neighbors.bottom.left,
       neighbors.bottom.center,
       neighbors.bottom.right,
-    ]
+    ];
 
-    this._neighborhood = neighbors
-    return neighbors
+    this._neighborhood = neighbors;
+    return neighbors;
   }
 }
