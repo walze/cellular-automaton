@@ -1,11 +1,4 @@
-import {
-  ParticleContainer,
-  Sprite,
-  Texture,
-  Renderer,
-  Ticker,
-  Container,
-} from "pixi.js";
+import { Renderer, Ticker, Container } from "pixi.js";
 import { Cell, ICellContructor } from "./Cell";
 import { make2DArray, map2d } from "./helpers";
 
@@ -65,7 +58,7 @@ Ticker.system.add(() => {
   APP.render(container);
 });
 
-view.addEventListener("mousedown", (e) => {
+document.addEventListener("click", (e) => {
   const cell = click(e);
   if (!cell) return;
 
